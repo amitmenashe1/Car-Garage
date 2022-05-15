@@ -1,0 +1,183 @@
+swagger: "2.0"
+info:
+  title: "Garage Swagger"
+  description: "A simple API to manage a car garage"
+  version: "1.0.0"
+host: "localhost:8080"
+schemes:
+- "http"
+basePath: "/"
+paths:
+  /get:
+    get:
+      description: "Get all vehicles"
+      operationId: "getVehicles"
+      parameters:
+      - name: "sortBy"
+        in: "query"
+        description: "Sort by licenseNumber or no sort"
+        required: true
+        type: "string"
+        enum:
+        - "none"
+        - "licenseNumber"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Vehicle"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+  /get/{id}:
+    get:
+      description: "Get a vehicle by licenseNumber"
+      operationId: "getVehicleByLicenseNumber"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "vehicle licence number"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Vehicle"
+        404:
+          description: "Vehicle not found"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+  /add:
+    post:
+      description: "Add a vehicle"
+      operationId: "addVehicle"
+      parameters:
+      - name: "vehicleRequest"
+        in: "body"
+        description: "vehicle to add"
+        required: true
+        schema:
+          $ref: "#/definitions/VehicleRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Vehicle"
+        400:
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+  /inflate-wheels:
+    put:
+      description: "Inflate wheels"
+      operationId: "inflateWheels"
+      parameters:
+      - name: "inflateRequest"
+        in: "body"
+        description: "inflate request"
+        required: true
+        schema:
+          $ref: "#/definitions/InflateRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Vehicle"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+  /add-energy/{id}:
+    put:
+      description: "Add energy"
+      operationId: "addEnergy"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Car id"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Vehicle"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Vehicle:
+    type: object
+    properties:
+      licenseNumber:
+        type: string
+      modelName:
+        type: string
+      availableEnergyPercentage:
+        type: number
+      energy:
+        type: string
+        enum:
+        - Battery
+        - Fuel
+      wheels:
+        type: array
+        items:
+          type: object
+          properties:
+            maxAirPressure:
+              type: number
+            currentAirPressure:
+              type: number
+  VehicleRequest:
+    type: object
+    properties:
+      modelName:
+        type: string
+      energy:
+        type: string
+        enum:
+        - Battery
+        - Fuel
+      type:
+        type: string
+        enum:
+        - car
+        - truck
+        - motorcycle
+      currentEnergyLevel:
+        type: number
+      currentWheelsPressure:
+        type: array
+        items:
+          type: number
+  InflateRequest:
+    type: object
+    properties:
+      inflateAmount:
+        type: integer
+      licenseNumber:
+        type: string
+  Error:
+    type: object
+    properties:
+      status:
+        type: string
+        enum:
+        - "500"
+        - "404"
+        - "400"
